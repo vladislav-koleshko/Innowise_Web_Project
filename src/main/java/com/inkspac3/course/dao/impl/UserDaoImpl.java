@@ -9,17 +9,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.mindrot.jbcrypt.BCrypt;
 
 public class UserDaoImpl implements UserDao {
+  private static final String FIND_BY_ID = "SELECT id, username, email FROM users WHERE id = ?";
+  private static final String FIND_ALL = "SELECT id, username, email, role FROM users";
+  private static final String SAVE = "INSERT INTO users (username, email, role, password_hash) VALUES (?, ?, ?, ?)";
+  private static final String UPDATE = "UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?";
+  private static final String DELETE = "DELETE FROM users WHERE id = ?";
   private HikariConnection connection;
   
   @Override
   public Optional<User> findById(long id) throws DaoException {
-    String query = "SELECT id, username, email FROM users WHERE id = ?";
-
     try (Connection connection = HikariConnection.getConnection();
-         PreparedStatement ps = connection.prepareStatement(query)) {
+         PreparedStatement ps = connection.prepareStatement(FIND_BY_ID)) {
 
       ps.setLong(1, id);
       try (ResultSet rs = ps.executeQuery()) {
@@ -40,11 +42,10 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public List<User> findAll() throws DaoException {
-    String query = "SELECT id, username, email, role FROM users";
     List<User> users = new ArrayList<>();
 
     try (Connection connection = HikariConnection.getConnection();
-         PreparedStatement ps = connection.prepareStatement(query)) {
+         PreparedStatement ps = connection.prepareStatement(FIND_ALL)) {
          try (ResultSet rs = ps.executeQuery()) {
            while (rs.next()) {
              User user = new User();
@@ -63,10 +64,8 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public User save(User user) throws DaoException {
-    String query = "INSERT INTO users (username, email, role, password_hash) VALUES (?, ?, ?, ?)";
-
     try(Connection connection = HikariConnection.getConnection();
-      PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+      PreparedStatement ps = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
       ps.setString(1, user.getName());
       ps.setString(2, user.getEmail());
       ps.setString(3, user.getRole().toString());
@@ -86,10 +85,8 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public boolean update(User user) throws DaoException {
-    String query = "UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?";
-
     try(Connection connection = HikariConnection.getConnection();
-    PreparedStatement ps = connection.prepareStatement(query)) {
+    PreparedStatement ps = connection.prepareStatement(UPDATE)) {
       ps.setString(1, user.getName());
       ps.setString(2, user.getEmail());
       ps.setString(3, user.getRole().toString());
@@ -104,10 +101,8 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public boolean delete(long id) throws DaoException {
-    String query = "DELETE FROM users WHERE id = ?";
-
     try(Connection connection = HikariConnection.getConnection();
-        PreparedStatement ps = connection.prepareStatement(query)) {
+        PreparedStatement ps = connection.prepareStatement(DELETE)) {
      ps.setLong(1, id);
 
       int rows = ps.executeUpdate();
