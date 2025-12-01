@@ -3,11 +3,10 @@ package com.inkspac3.course.connection;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class HikariConnectionPool {
+public class HikariConnection {
   private static HikariDataSource ds;
   private static Dotenv dotenv = Dotenv.load();
 
@@ -25,7 +24,7 @@ public class HikariConnectionPool {
     ds = new HikariDataSource(config);
   }
 
-  private HikariConnectionPool() {}
+  private HikariConnection() {}
 
   public static Connection getConnection() throws SQLException {
     return ds.getConnection();

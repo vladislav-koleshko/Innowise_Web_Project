@@ -20,16 +20,13 @@ public class RegisterController extends HttpServlet {
   }
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    resp.setContentType("text/html");
-
+  protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+    response.setContentType("text/html");
   }
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     response.setContentType("text/html");
-
-
   }
 
   @Override
