@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация — АудиоТреки</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/css/styles.css">
 </head>
 <body>
 <div class="auth-container">
@@ -17,13 +17,13 @@
 
     <form method="post" action="${pageContext.request.contextPath}/register">
         <label for="username">Имя пользователя</label>
-        <input type="text" id="username" name="username" placeholder="Ваш логин" required>
+        <input type="text" id="username" name="username" pattern = "^[A-Za-z0-9_]{4,20}$" title="Только буквы и цифры. Длина должна быть от 4 символов!" placeholder="Ваш логин" required>
 
         <label for="email">E-mail</label>
         <input type="email" id="email" name="email" placeholder="example@mail.com" required>
 
         <label for="password">Пароль</label>
-        <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+        <input type="password" id="password" name="password" pattern = "^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}$" title="Минимум одна буква, цифра и спецсимвол. Длина пароля должна быть от 8 символов!" placeholder="Введите пароль" required>
 
         <label for="confirmPassword">Повторите пароль</label>
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Повтор пароля" required>
