@@ -20,17 +20,11 @@ public class UserServiceImpl implements UserService {
     try {
       Optional<User> userOpt = userDao.findByUsername(dto.getUsername());
 
-      if (userOpt.isEmpty()) {
-        throw new ServiceException("Invalid username");
+      if(userOpt.isEmpty() || !PasswordEncoder.verify(dto.getPassword(), userOpt.get().getPasswordHash())) {
+        throw new ServiceException("Invalid login or password");
       }
 
-      User user = userOpt.get();
-
-      if(!PasswordEncoder.verify(dto.getPassword(), user.getPasswordHash())) {
-        throw new ServiceException("Invalid password");
-      }
-
-      return user;
+      return userOpt.get();
     } catch (DaoException e) {
       throw new ServiceException("Failed to authenticate user", e);
     }
@@ -38,9 +32,14 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User register(RegisterUserDto dto) throws ServiceException, DaoException {
-    Optional<User> userOpt = userDao.findByUsername(dto.getUsername());
-    if (userOpt.isPresent()) {
+    Optional<User> userByUsername = userDao.findByUsername(dto.getUsername());
+    if (userByUsername.isPresent()) {
       throw new ServiceException("Username is already taken");
+    }
+
+    Optional<User> userByEmail = userDao.findByEmail(dto.getEmail());
+    if (userByEmail.isPresent()) {
+      throw new ServiceException("Email is already taken");
     }
 
     if (!dto.getPassword().equals(dto.getConfirmPassword())) {

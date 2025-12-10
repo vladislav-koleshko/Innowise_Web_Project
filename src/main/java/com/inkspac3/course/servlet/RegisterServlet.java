@@ -4,6 +4,8 @@ import com.inkspac3.course.dto.RegisterUserDto;
 import com.inkspac3.course.exception.ServiceException;
 import com.inkspac3.course.service.UserService;
 import com.inkspac3.course.service.impl.UserServiceImpl;
+import com.inkspac3.course.validator.*;
+import com.inkspac3.course.validator.impl.RegistrationValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,22 +27,28 @@ public class RegisterServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    RegisterUserDto dto = new RegisterUserDto();
-    dto.setUsername(req.getParameter("username"));
-    dto.setEmail(req.getParameter("email"));
-    dto.setPassword(req.getParameter("password"));
-    dto.setConfirmPassword(req.getParameter("confirmPassword"));
+    RegisterUserDto userDto = new RegisterUserDto();
+    userDto.setUsername(req.getParameter("username"));
+    userDto.setEmail(req.getParameter("email"));
+    userDto.setPassword(req.getParameter("password"));
+    userDto.setConfirmPassword(req.getParameter("confirmPassword"));
+    Validator<RegisterUserDto> validator = new RegistrationValidator();
+
+    if(!validator.validate(userDto)) {
+      req.setAttribute("error", "Некорректный формат логина или пароля");
+      req.setAttribute("user", userDto);
+      req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
+      return;
+    }
 
     try {
-      userService.register(dto);
+      userService.register(userDto);
       resp.sendRedirect(req.getContextPath() + "/pages/login.jsp");
-
     } catch (ServiceException e) {
       req.setAttribute("error", e.getMessage());
-      req.setAttribute("user", dto);
+      req.setAttribute("user", userDto);
       req.getRequestDispatcher("/pages/register.jsp").forward(req, resp);
       logger.error(e);
-
     } catch (Exception e) {
       req.setAttribute("error", "Internal server error");
       req.getRequestDispatcher("/pages/register.jsp").forward(req, resp);

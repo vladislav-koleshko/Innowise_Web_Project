@@ -5,6 +5,8 @@ import com.inkspac3.course.exception.ServiceException;
 import com.inkspac3.course.model.User;
 import com.inkspac3.course.service.UserService;
 import com.inkspac3.course.service.impl.UserServiceImpl;
+import com.inkspac3.course.validator.Validator;
+import com.inkspac3.course.validator.impl.LoginValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,6 +32,14 @@ public class LoginServlet extends HttpServlet {
     LoginUserDto userDto = new LoginUserDto();
     userDto.setUsername(req.getParameter("username"));
     userDto.setPassword(req.getParameter("password"));
+    Validator<LoginUserDto> validator = new LoginValidator();
+
+    if(!validator.validate(userDto)) {
+      req.setAttribute("error", "Некорректный формат логина или пароля");
+      req.setAttribute("user", userDto);
+      req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
+      return;
+    }
 
     try{
       User user = userService.authenticate(userDto);
