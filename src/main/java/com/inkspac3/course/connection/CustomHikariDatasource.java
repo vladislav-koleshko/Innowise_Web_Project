@@ -6,7 +6,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class HikariConnection {
+public class CustomHikariDatasource {
   private static HikariDataSource ds;
   private static Dotenv dotenv = Dotenv.load();
 
@@ -25,7 +25,7 @@ public class HikariConnection {
     ds = new HikariDataSource(config);
   }
 
-  private HikariConnection() {}
+  private CustomHikariDatasource() {}
 
   public static Connection getConnection() throws SQLException {
     return ds.getConnection();

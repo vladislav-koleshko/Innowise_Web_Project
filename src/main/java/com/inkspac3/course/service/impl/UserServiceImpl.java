@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     try {
       Optional<User> userOpt = userDao.findByUsername(dto.getUsername());
 
-      if(userOpt.isEmpty() || !PasswordEncoder.verify(dto.getPassword(), userOpt.get().getPasswordHash())) {
+      if (userOpt.isEmpty() || !PasswordEncoder.verify(dto.getPassword(), userOpt.get().getPasswordHash())) {
         throw new ServiceException("Invalid login or password");
       }
 
@@ -31,33 +31,33 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User register(RegisterUserDto dto) throws ServiceException, DaoException {
-    Optional<User> userByUsername = userDao.findByUsername(dto.getUsername());
-    if (userByUsername.isPresent()) {
-      throw new ServiceException("Username is already taken");
-    }
-
-    Optional<User> userByEmail = userDao.findByEmail(dto.getEmail());
-    if (userByEmail.isPresent()) {
-      throw new ServiceException("Email is already taken");
-    }
-
-    if (!dto.getPassword().equals(dto.getConfirmPassword())) {
-      throw new ServiceException("Passwords do not match");
-    }
-
-    var hashedPassword = PasswordEncoder.encode(dto.getPassword());
-
-    User user = new User();
-    user.setName(dto.getUsername());
-    user.setEmail(dto.getEmail());
-    user.setPasswordHash(hashedPassword);
-    user.setRole(User.Role.CLIENT);
-
+  public User register(RegisterUserDto dto) throws ServiceException {
     try {
+      Optional<User> userByUsername = userDao.findByUsername(dto.getUsername());
+      if (userByUsername.isPresent()) {
+        throw new ServiceException("Username is already taken");
+      }
+
+      Optional<User> userByEmail = userDao.findByEmail(dto.getEmail());
+      if (userByEmail.isPresent()) {
+        throw new ServiceException("Email is already taken");
+      }
+
+      if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+        throw new ServiceException("Passwords do not match");
+      }
+
+      var hashedPassword = PasswordEncoder.encode(dto.getPassword());
+
+      User user = new User();
+      user.setName(dto.getUsername());
+      user.setEmail(dto.getEmail());
+      user.setPasswordHash(hashedPassword);
+      user.setRole(User.Role.CLIENT);
+
       return userDao.save(user);
     } catch (DaoException e) {
-      throw new ServiceException(e);
+      throw new ServiceException("Failed to register user", e);
     }
   }
 

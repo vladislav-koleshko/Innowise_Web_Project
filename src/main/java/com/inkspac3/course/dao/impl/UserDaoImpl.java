@@ -1,6 +1,6 @@
 package com.inkspac3.course.dao.impl;
 
-import com.inkspac3.course.connection.HikariConnection;
+import com.inkspac3.course.connection.CustomHikariDatasource;
 import com.inkspac3.course.dao.UserDao;
 import com.inkspac3.course.exception.DaoException;
 import com.inkspac3.course.model.User;
@@ -15,12 +15,12 @@ public class UserDaoImpl implements UserDao {
   private static final String SQL_FIND_BY_USERNAME = "SELECT id, username, email, password_hash, role FROM users WHERE username = ?";
   private static final String SQL_FIND_BY_EMAIL = "SELECT id, username, email, password_hash, role FROM users WHERE email = ?";
   private static final String SQL_SAVE = "INSERT INTO users (username, email, role, password_hash) VALUES (?, ?, ?::user_role, ?)";
-  private static final String SQL_UPDATE = "UPDATE users SET username = ?, email = ?, password_hash = ?, role = ? WHERE id = ?";
+  private static final String SQL_UPDATE = "UPDATE users SET username = ?, email = ?, password_hash = ?, role = ?::user_role WHERE id = ?";
   private static final String SQL_DELETE = "DELETE FROM users WHERE id = ?";
 
   @Override
   public Optional<User> findById(long id) throws DaoException {
-    try (Connection connection = HikariConnection.getConnection();
+    try (Connection connection = CustomHikariDatasource.getConnection();
          PreparedStatement ps = connection.prepareStatement(SQL_FIND_BY_ID)) {
 
       ps.setLong(1, id);
@@ -39,7 +39,7 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public Optional<User> findByUsername(String username) throws DaoException {
-    try (Connection connection = HikariConnection.getConnection();
+    try (Connection connection = CustomHikariDatasource.getConnection();
          PreparedStatement ps = connection.prepareStatement(SQL_FIND_BY_USERNAME)) {
 
       ps.setString(1, username);
@@ -59,7 +59,7 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public Optional<User> findByEmail(String email) throws DaoException {
-    try (Connection connection = HikariConnection.getConnection();
+    try (Connection connection = CustomHikariDatasource.getConnection();
          PreparedStatement ps = connection.prepareStatement(SQL_FIND_BY_EMAIL)) {
 
       ps.setString(1, email);
@@ -78,7 +78,7 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public User save(User user) throws DaoException {
-    try (Connection connection = HikariConnection.getConnection();
+    try (Connection connection = CustomHikariDatasource.getConnection();
          PreparedStatement ps = connection.prepareStatement(SQL_SAVE, Statement.RETURN_GENERATED_KEYS)) {
       ps.setString(1, user.getName());
       ps.setString(2, user.getEmail());
@@ -100,7 +100,7 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public boolean update(User user) throws DaoException {
-    try (Connection connection = HikariConnection.getConnection();
+    try (Connection connection = CustomHikariDatasource.getConnection();
          PreparedStatement ps = connection.prepareStatement(SQL_UPDATE)) {
       ps.setString(1, user.getName());
       ps.setString(2, user.getEmail());
@@ -119,7 +119,7 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public boolean delete(long id) throws DaoException {
-    try (Connection connection = HikariConnection.getConnection();
+    try (Connection connection = CustomHikariDatasource.getConnection();
          PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
       ps.setLong(1, id);
 

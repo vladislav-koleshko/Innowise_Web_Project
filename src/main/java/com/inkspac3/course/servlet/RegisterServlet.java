@@ -35,7 +35,7 @@ public class RegisterServlet extends HttpServlet {
     Validator<RegisterUserDto> validator = new RegistrationValidator();
 
     if(!validator.validate(userDto)) {
-      req.setAttribute("error", "Некорректный формат логина или пароля");
+      req.setAttribute("error", "Invalid username or password");
       req.setAttribute("user", userDto);
       req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
       return;
