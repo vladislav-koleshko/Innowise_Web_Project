@@ -12,29 +12,29 @@
 <div class="container">
     <h2>Личный кабинет</h2>
 
-    <c:if test="${not empty message}">
-        <div class="success">${message}</div>
-    </c:if>
+    <div class="success" style="${empty message ? 'display:none;' : ''}">
+        ${message}
+    </div>
+    <div class="error" style="${empty error ? 'display:none;' : ''}">
+        ${error}
+    </div>
 
-    <c:if test="${not empty error}">
-        <div class="error">${error}</div>
-    </c:if>
 
     <form action="${pageContext.request.contextPath}/updateProfile" method="post">
         <label for="email">Email</label>
         <input type="email" id="email" name="email" value="${sessionScope.user.email}" required>
 
         <label for="password">Новый пароль</label>
-        <input type="password" id="password" name="password" placeholder="Введите новый пароль">
+        <input type="password" id="password" name="password" pattern = "^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}$" title="Минимум одна буква, цифра и спецсимвол. Длина пароля должна быть от 8 символов!" placeholder="Введите новый пароль">
 
         <label for="confirmPassword">Подтвердите пароль</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Подтвердите новый пароль">
+        <input type="password" id="confirmPassword" name="confirmPassword" pattern = "^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}$" title="Минимум одна буква, цифра и спецсимвол. Длина пароля должна быть от 8 символов!" placeholder="Подтвердите новый пароль">
 
         <button type="submit" class="btn">Сохранить изменения</button>
     </form>
 
     <div class="links">
-        <a href="${pageContext.request.contextPath}/pages/dashboard.jsp">Назад на дашборд</a>
+        <a href="${pageContext.request.contextPath}/pages/dashboard.jsp">Назад</a>
     </div>
 </div>
 </body>

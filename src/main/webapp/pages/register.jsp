@@ -11,9 +11,9 @@
 <div class="auth-container">
     <h2>Регистрация</h2>
 
-    <c:if test="${not empty error}">
-        <p style="color:red">${error}</p>
-    </c:if>
+    <div class="error" style="${empty error ? 'display:none;' : ''}">
+        ${error}
+    </div>
 
     <form method="post" action="${pageContext.request.contextPath}/register">
         <label for="username">Имя пользователя</label>
@@ -32,7 +32,7 @@
     </form>
 
     <div class="links">
-        Уже есть аккаунт? <a href="login.jsp">Войти</a>
+        Уже есть аккаунт? <a href="${pageContext.request.contextPath}/pages/login.jsp">Войти</a>
     </div>
 </div>
 </body>
