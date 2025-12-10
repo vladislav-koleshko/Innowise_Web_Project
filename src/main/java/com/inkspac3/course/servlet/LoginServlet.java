@@ -1,6 +1,6 @@
 package com.inkspac3.course.servlet;
 
-import com.inkspac3.course.dto.LoginUserDto;
+import com.inkspac3.course.model.dto.LoginUserDto;
 import com.inkspac3.course.exception.ServiceException;
 import com.inkspac3.course.model.User;
 import com.inkspac3.course.service.UserService;

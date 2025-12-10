@@ -1,6 +1,6 @@
 package com.inkspac3.course.validator.impl;
 
-import com.inkspac3.course.dto.LoginUserDto;
+import com.inkspac3.course.model.dto.LoginUserDto;
 import com.inkspac3.course.util.validation.RegexPattern;
 import com.inkspac3.course.validator.Validator;
 import org.apache.logging.log4j.LogManager;

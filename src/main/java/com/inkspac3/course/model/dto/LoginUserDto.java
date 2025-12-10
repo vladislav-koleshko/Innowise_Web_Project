@@ -1,4 +1,4 @@
-package com.inkspac3.course.dto;
+package com.inkspac3.course.model.dto;
 
 public class LoginUserDto {
   private String username;

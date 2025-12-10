@@ -1,6 +1,6 @@
 package com.inkspac3.course.validator.impl;
 
-import com.inkspac3.course.dto.RegisterUserDto;
+import com.inkspac3.course.model.dto.RegisterUserDto;
 import com.inkspac3.course.util.validation.RegexPattern;
 import com.inkspac3.course.validator.Validator;
 

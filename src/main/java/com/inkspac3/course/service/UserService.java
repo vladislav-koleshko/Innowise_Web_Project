@@ -1,7 +1,7 @@
 package com.inkspac3.course.service;
 
-import com.inkspac3.course.dto.LoginUserDto;
-import com.inkspac3.course.dto.RegisterUserDto;
+import com.inkspac3.course.model.dto.LoginUserDto;
+import com.inkspac3.course.model.dto.RegisterUserDto;
 import com.inkspac3.course.exception.DaoException;
 import com.inkspac3.course.exception.ServiceException;
 import com.inkspac3.course.model.User;
