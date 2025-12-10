@@ -7,19 +7,17 @@ import com.inkspac3.course.model.User;
 import org.apache.logging.log4j.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
   private static final Logger logger = LogManager.getLogger();
   private static final String SQL_FIND_BY_ID = "SELECT id, username, email, role FROM users WHERE id = ?";
   private static final String SQL_FIND_BY_USERNAME = "SELECT id, username, email, password_hash, role FROM users WHERE username = ?";
-  private static final String SQL_FIND_ALL = "SELECT id, username, email, role FROM users";
+  private static final String SQL_FIND_BY_EMAIL = "SELECT id, username, email, password_hash, role FROM users WHERE email = ?";
   private static final String SQL_SAVE = "INSERT INTO users (username, email, role, password_hash) VALUES (?, ?, ?::user_role, ?)";
   private static final String SQL_UPDATE = "UPDATE users SET username = ?, email = ?, password_hash = ?, role = ? WHERE id = ?";
   private static final String SQL_DELETE = "DELETE FROM users WHERE id = ?";
-  
+
   @Override
   public Optional<User> findById(long id) throws DaoException {
     try (Connection connection = HikariConnection.getConnection();
@@ -59,36 +57,36 @@ public class UserDaoImpl implements UserDao {
     return Optional.empty();
   }
 
-
   @Override
-  public List<User> findAll() throws DaoException {
-    List<User> users = new ArrayList<>();
-
+  public Optional<User> findByEmail(String email) throws DaoException {
     try (Connection connection = HikariConnection.getConnection();
-         PreparedStatement ps = connection.prepareStatement(SQL_FIND_ALL)) {
-         try (ResultSet rs = ps.executeQuery()) {
-           while (rs.next()) {
-             users.add(mapToUser(rs));
-           }
-         }
+         PreparedStatement ps = connection.prepareStatement(SQL_FIND_BY_EMAIL)) {
+
+      ps.setString(1, email);
+      try (ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+          return Optional.of(mapToUser(rs));
+        }
+      }
+
     } catch (SQLException e) {
-      logger.error("Error finding users", e);
-      throw new DaoException("Error finding users", e);
+      logger.error("Error finding user by email: {}", email, e);
+      throw new DaoException("Error finding user by email: " + email, e);
     }
-    return users;
+    return Optional.empty();
   }
 
   @Override
   public User save(User user) throws DaoException {
-    try(Connection connection = HikariConnection.getConnection();
-      PreparedStatement ps = connection.prepareStatement(SQL_SAVE, Statement.RETURN_GENERATED_KEYS)) {
+    try (Connection connection = HikariConnection.getConnection();
+         PreparedStatement ps = connection.prepareStatement(SQL_SAVE, Statement.RETURN_GENERATED_KEYS)) {
       ps.setString(1, user.getName());
       ps.setString(2, user.getEmail());
       ps.setString(3, user.getRole().toString());
       ps.setString(4, user.getPasswordHash());
       ps.executeUpdate();
 
-      try(ResultSet rs = ps.getGeneratedKeys()) {
+      try (ResultSet rs = ps.getGeneratedKeys()) {
         if (rs.next()) {
           user.setId(rs.getLong(1));
         }
@@ -96,14 +94,14 @@ public class UserDaoImpl implements UserDao {
       return user;
     } catch (SQLException e) {
       logger.error("Error saving user: {}", user, e);
-      throw new DaoException("Error saving user",e);
+      throw new DaoException("Error saving user", e);
     }
   }
 
   @Override
   public boolean update(User user) throws DaoException {
-    try(Connection connection = HikariConnection.getConnection();
-    PreparedStatement ps = connection.prepareStatement(SQL_UPDATE)) {
+    try (Connection connection = HikariConnection.getConnection();
+         PreparedStatement ps = connection.prepareStatement(SQL_UPDATE)) {
       ps.setString(1, user.getName());
       ps.setString(2, user.getEmail());
       ps.setString(3, user.getPasswordHash());
@@ -121,9 +119,9 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public boolean delete(long id) throws DaoException {
-    try(Connection connection = HikariConnection.getConnection();
-        PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
-     ps.setLong(1, id);
+    try (Connection connection = HikariConnection.getConnection();
+         PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
+      ps.setLong(1, id);
 
       int rows = ps.executeUpdate();
       return rows > 0;
