@@ -1,12 +1,12 @@
 package com.inkspac3.course.dto;
 
-public class UserDto{
+public class RegisterUserDto {
   private String username;
   private String email;
   private String password;
-  private String passwordConfirm;
+  private String confirmPassword;
 
-  public UserDto() {}
+  public RegisterUserDto() {}
 
   public String getUsername() { return username; }
   public void setUsername(String username) { this.username = username; }
@@ -17,6 +17,6 @@ public class UserDto{
   public String getPassword() { return password; }
   public void setPassword(String password) { this.password = password; }
 
-  public String getPasswordConfirm() { return passwordConfirm; }
-  public void setPasswordConfirm(String passwordConfirm) { this.passwordConfirm = passwordConfirm; }
+  public String getConfirmPassword() { return confirmPassword; }
+  public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }
 }

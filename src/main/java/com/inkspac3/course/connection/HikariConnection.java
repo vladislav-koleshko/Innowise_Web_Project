@@ -20,6 +20,7 @@ public class HikariConnection {
     config.setIdleTimeout(Integer.parseInt(dotenv.get("IDLE_TIMEOUT")));
     config.setConnectionTimeout(Integer.parseInt(dotenv.get("CONNECTION_TIMEOUT")));
     config.setPoolName("HikariAudioPool");
+    config.setDriverClassName("org.postgresql.Driver");
 
     ds = new HikariDataSource(config);
   }

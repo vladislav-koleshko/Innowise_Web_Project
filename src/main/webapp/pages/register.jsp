@@ -11,7 +11,11 @@
 <div class="auth-container">
     <h2>Регистрация</h2>
 
-    <form action="register" method="post">
+    <c:if test="${not empty error}">
+        <p style="color:red">${error}</p>
+    </c:if>
+
+    <form method="post" action="${pageContext.request.contextPath}/register">
         <label for="username">Имя пользователя</label>
         <input type="text" id="username" name="username" placeholder="Ваш логин" required>
 
@@ -21,14 +25,14 @@
         <label for="password">Пароль</label>
         <input type="password" id="password" name="password" placeholder="Введите пароль" required>
 
-        <label for="password2">Повторите пароль</label>
-        <input type="password" id="password2" name="password2" placeholder="Повтор пароля" required>
+        <label for="confirmPassword">Повторите пароль</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Повтор пароля" required>
 
         <button type="submit" class="btn">Создать аккаунт</button>
     </form>
 
     <div class="links">
-        Уже есть аккаунт? <a href="auth.jsp">Войти</a>
+        Уже есть аккаунт? <a href="login.jsp">Войти</a>
     </div>
 </div>
 </body>

@@ -17,7 +17,7 @@ body {
 h1 {
     font-size: 80px;
     margin: 0;
-    color: #ff4444;
+    color: dodgerblue;
 }
 h2 {
     font-size: 28px;
@@ -30,7 +30,7 @@ p {
     color: #cccccc;
 }
 a {
-    background: #ff4444;
+    background: dodgerblue;
     padding: 12px 25px;
     text-decoration: none;
     color: #fff;
@@ -39,5 +39,5 @@ a {
     transition: 0.3s;
 }
 a:hover {
-    background: #cc0000;
+    background: #3b82f6;
 }

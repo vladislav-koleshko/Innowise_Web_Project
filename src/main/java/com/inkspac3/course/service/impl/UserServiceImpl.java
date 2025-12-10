@@ -2,57 +2,90 @@ package com.inkspac3.course.service.impl;
 
 import com.inkspac3.course.dao.UserDao;
 import com.inkspac3.course.dao.impl.UserDaoImpl;
-import com.inkspac3.course.dto.UserDto;
+import com.inkspac3.course.dto.LoginUserDto;
+import com.inkspac3.course.dto.RegisterUserDto;
 import com.inkspac3.course.exception.DaoException;
+import com.inkspac3.course.exception.ServiceException;
 import com.inkspac3.course.model.User;
 import com.inkspac3.course.service.UserService;
-import org.mindrot.jbcrypt.BCrypt;
+import com.inkspac3.course.util.PasswordEncoder;
 
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
-  private static final UserService instance = new UserServiceImpl();
-  private UserDao userDao = new UserDaoImpl();
+  private final UserDao userDao = new UserDaoImpl();
 
-  private UserServiceImpl() {}
+  @Override
+  public User authenticate(LoginUserDto dto) throws ServiceException {
+    try {
+      Optional<User> userOpt = userDao.findByUsername(dto.getUsername());
 
-  public static UserService getInstance() {
-    return instance;
+      if (userOpt.isEmpty()) {
+        throw new ServiceException("Invalid username");
+      }
+
+      User user = userOpt.get();
+
+      if(!PasswordEncoder.verify(dto.getPassword(), user.getPasswordHash())) {
+        throw new ServiceException("Invalid password");
+      }
+
+      return user;
+    } catch (DaoException e) {
+      throw new ServiceException("Failed to authenticate user", e);
+    }
   }
 
   @Override
-  public boolean authenticate(User user, String password) {
-    return BCrypt.checkpw(password, user.getPasswordHash());
-  }
-
-  @Override
-  public User register(UserDto dto, String passwordConfrim) throws DaoException {
-    if (!dto.getPassword().equals(passwordConfrim)) {
-      throw new DaoException("Passwords do not match");
+  public User register(RegisterUserDto dto) throws ServiceException, DaoException {
+    Optional<User> userOpt = userDao.findByUsername(dto.getUsername());
+    if (userOpt.isPresent()) {
+      throw new ServiceException("Username is already taken");
     }
 
-    String hashed = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
+    if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+      throw new ServiceException("Passwords do not match");
+    }
+
+    var hashedPassword = PasswordEncoder.encode(dto.getPassword());
 
     User user = new User();
     user.setName(dto.getUsername());
     user.setEmail(dto.getEmail());
-    user.setPasswordHash(hashed);
+    user.setPasswordHash(hashedPassword);
+    user.setRole(User.Role.CLIENT);
 
-    return userDao.save(user);
+    try {
+      return userDao.save(user);
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
   }
 
   @Override
-  public Optional<User> getUser(long id) throws DaoException {
-    return userDao.findById(id);
+  public Optional<User> findUser(long id) throws ServiceException {
+    try {
+      return userDao.findById(id);
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
   }
 
   @Override
-  public boolean updateUser(User user) throws DaoException {
-    return userDao.update(user);
+  public boolean updateUser(User user) throws ServiceException {
+    try {
+      return userDao.update(user);
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
   }
 
   @Override
-  public boolean deleteUser(long id) throws DaoException {
-    return userDao.delete(id);
+  public boolean deleteUser(long id) throws ServiceException {
+    try {
+      return userDao.delete(id);
+    } catch (DaoException e) {
+      throw new ServiceException(e);
+    }
   }
 }

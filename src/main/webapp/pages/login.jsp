@@ -11,9 +11,9 @@
 <div class="auth-container">
     <h2>Вход в систему</h2>
 
-    <form action="login" method="post">
-        <label for="login">Логин</label>
-        <input type="text" id="login" name="login" placeholder="Введите логин" required>
+    <form action="${pageContext.request.contextPath}/login" method="post">
+        <label for="username">Логин</label>
+        <input type="text" id="username" name="username" placeholder="Введите логин" required>
 
         <label for="password">Пароль</label>
         <input type="password" id="password" name="password" placeholder="Введите пароль" required>

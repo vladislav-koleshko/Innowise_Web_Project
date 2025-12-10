@@ -123,8 +123,7 @@
 <header>
     <div class="logo">AUDIO TRACKS</div>
     <nav>
-        <a href="index.jsp">Главная</a>
-        <a href="pages/auth.jsp">Войти</a>
+        <a href="pages/login.jsp">Войти</a>
     </nav>
 </header>
 
@@ -136,7 +135,7 @@
         уникальным сборкам и альбомам. Управление клиентами, бонусами и скидками для администраторов.
     </p>
 
-    <a class="btn-main" href="pages/auth.jsp">Перейти к покупкам</a>
+    <a class="btn-main" href="pages/login.jsp">Перейти к покупкам</a>
 </section>
 
 <!-- ABOUT -->
