@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public interface UserDao extends BaseDao<User>{
   Optional<User> findById(final long id) throws DaoException;
-  Optional<User> findByUsername(final String username) throws DaoException;
-  Optional<User> findByEmail(final String email) throws DaoException;
+  Optional<User> findByUsername(final String username, final long currentUserId) throws DaoException;
+  Optional<User> findByEmail(final String email, final long currentUserId) throws DaoException;
   User save(User user) throws DaoException;
   boolean update(User user) throws DaoException;
   boolean delete(final long id) throws DaoException;

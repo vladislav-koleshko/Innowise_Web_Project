@@ -17,68 +17,26 @@ public class UserDaoImpl implements UserDao {
   private static final String SQL_SAVE = "INSERT INTO users (username, email, role, password_hash) VALUES (?, ?, ?::user_role, ?)";
   private static final String SQL_UPDATE = "UPDATE users SET username = ?, email = ?, password_hash = ?, role = ?::user_role WHERE id = ?";
   private static final String SQL_DELETE = "DELETE FROM users WHERE id = ?";
+  private static final String SQL_SET_USER = "SET app.current_user_id = ";
 
   @Override
   public Optional<User> findById(long id) throws DaoException {
-    try (Connection connection = CustomHikariDatasource.getConnection();
-         PreparedStatement ps = connection.prepareStatement(SQL_FIND_BY_ID)) {
-
-      ps.setLong(1, id);
-      try (ResultSet rs = ps.executeQuery()) {
-        if (rs.next()) {
-          return Optional.of(mapToUser(rs));
-        }
-      }
-    } catch (SQLException e) {
-      logger.error("Error finding user by id: {}", id, e);
-      throw new DaoException("Error finding user by id: " + id, e);
-    }
-
-    return Optional.empty();
+    return findUser(SQL_FIND_BY_ID, id, id);
   }
 
   @Override
-  public Optional<User> findByUsername(String username) throws DaoException {
-    try (Connection connection = CustomHikariDatasource.getConnection();
-         PreparedStatement ps = connection.prepareStatement(SQL_FIND_BY_USERNAME)) {
-
-      ps.setString(1, username);
-      try (ResultSet rs = ps.executeQuery()) {
-        if (rs.next()) {
-          return Optional.of(mapToUser(rs));
-        }
-      }
-
-    } catch (SQLException e) {
-      logger.error("Error finding user by username: {}", username, e);
-      throw new DaoException("Error finding user by username: " + username, e);
-    }
-
-    return Optional.empty();
+  public Optional<User> findByUsername(String username, long currentUserId) throws DaoException {
+    return findUser(SQL_FIND_BY_USERNAME, currentUserId, username);
   }
 
   @Override
-  public Optional<User> findByEmail(String email) throws DaoException {
-    try (Connection connection = CustomHikariDatasource.getConnection();
-         PreparedStatement ps = connection.prepareStatement(SQL_FIND_BY_EMAIL)) {
-
-      ps.setString(1, email);
-      try (ResultSet rs = ps.executeQuery()) {
-        if (rs.next()) {
-          return Optional.of(mapToUser(rs));
-        }
-      }
-
-    } catch (SQLException e) {
-      logger.error("Error finding user by email: {}", email, e);
-      throw new DaoException("Error finding user by email: " + email, e);
-    }
-    return Optional.empty();
+  public Optional<User> findByEmail(String email, long currentUserId) throws DaoException {
+    return findUser(SQL_FIND_BY_EMAIL, currentUserId, email);
   }
 
   @Override
   public User save(User user) throws DaoException {
-    try (Connection connection = CustomHikariDatasource.getConnection();
+    try (Connection connection = CustomHikariDatasource.getServiceConnection();
          PreparedStatement ps = connection.prepareStatement(SQL_SAVE, Statement.RETURN_GENERATED_KEYS)) {
       ps.setString(1, user.getName());
       ps.setString(2, user.getEmail());
@@ -100,17 +58,20 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public boolean update(User user) throws DaoException {
-    try (Connection connection = CustomHikariDatasource.getConnection();
-         PreparedStatement ps = connection.prepareStatement(SQL_UPDATE)) {
-      ps.setString(1, user.getName());
-      ps.setString(2, user.getEmail());
-      ps.setString(3, user.getPasswordHash());
-      ps.setString(4, user.getRole().toString());
-      ps.setLong(5, user.getId());
+    try (Connection connection = CustomHikariDatasource.getUserConnection()) {
+      setCurrentUserId(connection, user.getId());
 
-      int rows = ps.executeUpdate();
-      return rows > 0;
+      try (PreparedStatement ps = connection.prepareStatement(SQL_UPDATE)) {
+        ps.setString(1, user.getName());
+        ps.setString(2, user.getEmail());
+        ps.setString(3, user.getPasswordHash());
+        ps.setString(4, user.getRole().toString());
+        ps.setLong(5, user.getId());
 
+        int rows = ps.executeUpdate();
+        return rows > 0;
+
+      }
     } catch (SQLException e) {
       logger.error("Error updating user: {}", user, e);
       throw new DaoException("Error updating user", e);
@@ -119,13 +80,16 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public boolean delete(long id) throws DaoException {
-    try (Connection connection = CustomHikariDatasource.getConnection();
-         PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
-      ps.setLong(1, id);
+    try (Connection connection = CustomHikariDatasource.getServiceConnection()) {
+      setCurrentUserId(connection, id);
 
-      int rows = ps.executeUpdate();
-      return rows > 0;
+      try (PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
+        ps.setLong(1, id);
 
+        int rows = ps.executeUpdate();
+        return rows > 0;
+
+      }
     } catch (SQLException e) {
       logger.error("Error deleting user: {}", id, e);
       throw new DaoException("Error deleting user", e);
@@ -141,4 +105,32 @@ public class UserDaoImpl implements UserDao {
     user.setRole(User.Role.valueOf(rs.getString("role")));
     return user;
   }
+
+  private void setCurrentUserId(Connection connection, long userId) throws SQLException {
+    try (Statement stmt = connection.createStatement()) {
+      stmt.execute(SQL_SET_USER + userId);
+    }
+  }
+
+  private Optional<User> findUser(String sql, long currentUserId, Object... params) throws DaoException {
+    try (Connection connection = CustomHikariDatasource.getServiceConnection()) {
+      try (Statement stmt = connection.createStatement()) {
+        stmt.execute(SQL_SET_USER + currentUserId);
+      }
+
+      try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        for (int i = 0; i < params.length; i++) {
+          ps.setObject(i + 1, params[i]);
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+          return rs.next() ? Optional.of(mapToUser(rs)) : Optional.empty();
+        }
+      }
+    } catch (SQLException e) {
+      logger.error("Error executing query: {}", sql, e);
+      throw new DaoException("Error executing query: " + sql, e);
+    }
+  }
+
 }

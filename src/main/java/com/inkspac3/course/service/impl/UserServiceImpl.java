@@ -9,6 +9,7 @@ import com.inkspac3.course.exception.ServiceException;
 import com.inkspac3.course.model.User;
 import com.inkspac3.course.service.UserService;
 import com.inkspac3.course.util.PasswordEncoder;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.Optional;
 
@@ -16,14 +17,17 @@ public class UserServiceImpl implements UserService {
   private final UserDao userDao = new UserDaoImpl();
 
   @Override
-  public User authenticate(LoginUserDto dto) throws ServiceException {
+  public User authenticate(LoginUserDto dto, HttpSession session) throws ServiceException {
     try {
-      Optional<User> userOpt = userDao.findByUsername(dto.getUsername());
+      Optional<User> userOpt = userDao.findByUsername(dto.getUsername(),0);
 
       if (userOpt.isEmpty() || !PasswordEncoder.verify(dto.getPassword(), userOpt.get().getPasswordHash())) {
         throw new ServiceException("Invalid login or password");
       }
 
+      User user = userOpt.get();
+      session.setAttribute("userId", user.getId());
+      session.setAttribute("role", user.getRole());
       return userOpt.get();
     } catch (DaoException e) {
       throw new ServiceException("Failed to authenticate user", e);
@@ -33,12 +37,12 @@ public class UserServiceImpl implements UserService {
   @Override
   public User register(RegisterUserDto dto) throws ServiceException {
     try {
-      Optional<User> userByUsername = userDao.findByUsername(dto.getUsername());
+      Optional<User> userByUsername = userDao.findByUsername(dto.getUsername(), 0);
       if (userByUsername.isPresent()) {
         throw new ServiceException("Username is already taken");
       }
 
-      Optional<User> userByEmail = userDao.findByEmail(dto.getEmail());
+      Optional<User> userByEmail = userDao.findByEmail(dto.getEmail(), 0);
       if (userByEmail.isPresent()) {
         throw new ServiceException("Email is already taken");
       }

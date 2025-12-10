@@ -42,7 +42,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     try{
-      User user = userService.authenticate(userDto);
+      User user = userService.authenticate(userDto, req.getSession());
       req.getSession().setAttribute("user", user);
       req.getSession().setAttribute("role", user.getRole());
       resp.sendRedirect(req.getContextPath() + "/pages/dashboard.jsp");

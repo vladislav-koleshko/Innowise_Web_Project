@@ -3,31 +3,45 @@ package com.inkspac3.course.connection;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.cdimascio.dotenv.Dotenv;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class CustomHikariDatasource {
-  private static HikariDataSource ds;
-  private static Dotenv dotenv = Dotenv.load();
+
+  private static final HikariDataSource serviceDataSource;
+  private static final HikariDataSource userDataSource;
+  private static final Dotenv dotenv = Dotenv.load();
 
   static {
-    HikariConfig config = new HikariConfig();
-    config.setJdbcUrl(dotenv.get("DB_URL"));
-    config.setUsername(dotenv.get("DB_USERNAME"));
-    config.setPassword(dotenv.get("DB_PASSWORD"));
-    config.setMaximumPoolSize(Integer.parseInt(dotenv.get("MAXIMUM_POOL_SIZE")));
-    config.setMinimumIdle(Integer.parseInt(dotenv.get("MINIMUM_IDLE")));
-    config.setIdleTimeout(Integer.parseInt(dotenv.get("IDLE_TIMEOUT")));
-    config.setConnectionTimeout(Integer.parseInt(dotenv.get("CONNECTION_TIMEOUT")));
-    config.setPoolName("HikariAudioPool");
-    config.setDriverClassName("org.postgresql.Driver");
+    HikariConfig serviceConfig = new HikariConfig();
+    serviceConfig.setJdbcUrl(dotenv.get("DB_URL"));
+    serviceConfig.setUsername(dotenv.get("DB_SERVICE_USERNAME"));
+    serviceConfig.setPassword(dotenv.get("DB_SERVICE_PASSWORD"));
+    serviceConfig.setDriverClassName("org.postgresql.Driver");
+    serviceDataSource = new HikariDataSource(serviceConfig);
 
-    ds = new HikariDataSource(config);
+    HikariConfig userConfig = new HikariConfig();
+    userConfig.setJdbcUrl(dotenv.get("DB_URL"));
+    userConfig.setUsername(dotenv.get("DB_USERNAME"));
+    userConfig.setPassword(dotenv.get("DB_PASSWORD"));
+    userConfig.setMaximumPoolSize(Integer.parseInt(dotenv.get("MAXIMUM_POOL_SIZE")));
+    userConfig.setMinimumIdle(Integer.parseInt(dotenv.get("MINIMUM_IDLE")));
+    userConfig.setIdleTimeout(Long.parseLong(dotenv.get("IDLE_TIMEOUT")));
+    userConfig.setConnectionTimeout(Long.parseLong(dotenv.get("CONNECTION_TIMEOUT")));
+    userConfig.setPoolName("HikariAudioPool");
+    userConfig.setDriverClassName("org.postgresql.Driver");
+    serviceConfig.setMaximumPoolSize(5);
+    userDataSource = new HikariDataSource(userConfig);
   }
 
   private CustomHikariDatasource() {}
 
-  public static Connection getConnection() throws SQLException {
-    return ds.getConnection();
+  public static Connection getServiceConnection() throws SQLException {
+    return serviceDataSource.getConnection();
+  }
+
+  public static Connection getUserConnection() throws SQLException {
+    return userDataSource.getConnection();
   }
 }
