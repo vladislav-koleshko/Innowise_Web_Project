@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "orders", urlPatterns = "/orders")
-public class UserOrdersServlet extends HttpServlet {
+public class FindUserOrdersServlet extends HttpServlet {
   private static final Logger logger = LogManager.getLogger();
   private final OrderService orderService = new OrderServiceImpl();
 
