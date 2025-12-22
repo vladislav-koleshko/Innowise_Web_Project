@@ -74,6 +74,7 @@ button.btn.ghost:hover {
     background-color: #ff5722;
     color: #fff;
 }
+.btn-danger {color: #c62828;}
 
 .error {
     text-align: center;
@@ -91,4 +92,13 @@ button.btn.ghost:hover {
     border-radius: 4px;
     margin-bottom: 12px;
     color: #fff;
+}
+
+.back-link a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+.back-link a:hover {
+    text-decoration: underline;
 }

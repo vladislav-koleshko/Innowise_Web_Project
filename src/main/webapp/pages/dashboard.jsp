@@ -1,63 +1,66 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.inkspac3.course.model.User" %>
+
 <%
-    if (session.getAttribute("user") == null) {
-        response.sendRedirect(request.getContextPath() + "/login");
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        response.sendRedirect("login.jsp");
         return;
     }
 %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!doctype html>
-<html lang="ru">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Панель — АудиоТреки</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/css/dashboard.css">
 </head>
 <body>
-<div class="container">
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="logo">AT</div>
-            <div>
-                <div style="font-weight:700">АудиоТреки</div>
-                <div style="font-size:12px;color:var(--muted)">Личный кабинет пользователя</div>
+
+<header class="header">
+    <div class="logo">AUDIO</div>
+
+    <a class="user-link" href="${pageContext.request.contextPath}/orders">
+        <span class="username"><%= user.getName() %></span>
+    </a>
+</header>
+
+<main class="container">
+    <h1>Доступные биты</h1>
+
+    <div class="beats-grid">
+
+        <!-- Beat card -->
+        <div class="beat-card">
+            <div class="beat-info">
+                <h3>TEST1</h3>
+                <p class="author">by inkspac3</p>
+                <span class="price">$15</span>
             </div>
+
+            <audio controls>
+                <source src="${pageContext.request.contextPath}main/resources/audio/dark_trap.mp3" type="audio/mpeg">
+            </audio>
+
+            <button class="buy-btn">Купить</button>
         </div>
-        <nav>
-            <a href="${pageContext.request.contextPath}/pages/userOrders.jsp" class="active">Мои заказы</a>
-            <a href="${pageContext.request.contextPath}/pages/userTracks.jsp">Мои треки</a>
-            <a href="${pageContext.request.contextPath}/pages/userProfile.jsp">Личный кабинет</a>
-        </nav>
-        <hr style="border:0;border-top:1px solid rgba(255,255,255,0.02);margin:14px 0">
-        <div style="font-size:13px;color:var(--muted)">Баланс: <strong style="color:var(--accent)">1,240.50 ₽</strong></div>
-    </aside>
 
-    <main class="main">
-        <header class="card">
-            <div>
-                <h2 style="margin:0">Добро пожаловать, ${sessionScope.user.name}</h2>
-                <div style="font-size:13px;color:var(--muted)">Ваши треки и заказы</div>
+        <div class="beat-card">
+            <div class="beat-info">
+                <h3>TEST2</h3>
+                <p class="author">by inkspac3</p>
+                <span class="price">$20</span>
             </div>
-            <div class="search">
-                <input placeholder="Поиск трека или заказа..." />
-                <button class="btn ghost">Поиск</button>
-            </div>
-        </header>
 
-        <section class="grid-1">
-            <div id="myOrders" class="card">
-                <h3>Мои заказы</h3>
-                <div class="list">
-                    <c:forEach var="order" items="${orders}">
-                        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:8px">
-                            <div style="font-weight:600">${order.trackTitle} <span style="font-weight:400;color:var(--muted);font-size:13px"> — ${order.date}</span></div>
-                            <div style="margin-top:6px;color:var(--muted)">Количество: ${order.quantity} | Статус: ${order.status}</div>
-                        </div>
-                    </c:forEach>
-                </div>
-            </div>
-        </section>
-    </main>
-</div>
+            <audio controls>
+                <source src="${pageContext.request.contextPath}main/resources/audio/dark_trap.mp3" type="audio/mpeg">
+            </audio>
+
+            <button class="buy-btn">Купить</button>
+        </div>
+
+    </div>
+</main>
+
 </body>
 </html>

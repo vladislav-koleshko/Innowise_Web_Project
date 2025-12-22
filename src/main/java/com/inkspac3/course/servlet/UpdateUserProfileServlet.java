@@ -38,19 +38,19 @@ public class UpdateUserProfileServlet extends HttpServlet {
     try {
       if (newEmail == null || !newEmail.matches(RegexPattern.EMAIL)) {
         req.setAttribute("error", "Invalid format of email");
-        req.getRequestDispatcher("/pages/userProfile.jsp").forward(req, resp);
+        req.getRequestDispatcher("/pages/changeUserProfile.jsp").forward(req, resp);
         return;
       }
 
       if (newPassword != null && !newPassword.isEmpty()) {
         if (!newPassword.matches(RegexPattern.PASSWORD)) {
           req.setAttribute("error", "Password must be at least 8 characters and include at least one digit, letter and special symbol");
-          req.getRequestDispatcher("/pages/userProfile.jsp").forward(req, resp);
+          req.getRequestDispatcher("/pages/changeUserProfile.jsp").forward(req, resp);
           return;
         }
         if (!newPassword.equals(confirmPassword)) {
           req.setAttribute("error", "Passwords do not match");
-          req.getRequestDispatcher("/pages/userProfile.jsp").forward(req, resp);
+          req.getRequestDispatcher("/pages/changeUserProfile.jsp").forward(req, resp);
           return;
         }
         currentUser.setPasswordHash(PasswordEncoder.encode(newPassword));
@@ -71,6 +71,6 @@ public class UpdateUserProfileServlet extends HttpServlet {
       req.setAttribute("error", "Error while updating user profile");
     }
 
-    req.getRequestDispatcher("/pages/userProfile.jsp").forward(req, resp);
+    req.getRequestDispatcher("/pages/changeUserProfile.jsp").forward(req, resp);
   }
 }

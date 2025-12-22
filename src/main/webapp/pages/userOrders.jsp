@@ -5,13 +5,14 @@
   }
 %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Панель — АудиоТреки</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/css/dashboard.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/css/userprofile.css">
 </head>
 <body>
 <div class="container">
@@ -24,12 +25,16 @@
       </div>
     </div>
     <nav>
-      <a href="${pageContext.request.contextPath}/pages/userOrders.jsp" class="active">Мои заказы</a>
+      <div class="back-link">
+        <a href="${pageContext.request.contextPath}/pages/dashboard.jsp">← На главную</a>
+      </div>
+      <a href="${pageContext.request.contextPath}/orders" class="active">Мои заказы</a>
       <a href="${pageContext.request.contextPath}/pages/userTracks.jsp">Мои треки</a>
-      <a href="${pageContext.request.contextPath}/pages/userProfile.jsp">Личный кабинет</a>
+      <a href="${pageContext.request.contextPath}/pages/changeUserProfile.jsp">Изменить профиль</a>
+      <a href="${pageContext.request.contextPath}/logout" class="btn-danger">Выйти</a>
     </nav>
     <hr style="border:0;border-top:1px solid rgba(255,255,255,0.02);margin:14px 0">
-    <div style="font-size:13px;color:var(--muted)">Баланс: <strong style="color:var(--accent)">1,240.50 ₽</strong></div>
+    <div style="font-size:13px;color:var(--muted)">Баланс: <strong style="color:var(--accent)">500 $</strong></div>
   </aside>
 
   <main class="main">
@@ -48,12 +53,24 @@
       <div id="myOrders" class="card">
         <h3>Мои заказы</h3>
         <div class="list">
-          <c:forEach var="order" items="${orders}">
-            <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:8px">
-              <div style="font-weight:600">${order.trackTitle} <span style="font-weight:400;color:var(--muted);font-size:13px"> — ${order.date}</span></div>
-              <div style="margin-top:6px;color:var(--muted)">Количество: ${order.quantity} | Статус: ${order.status}</div>
-            </div>
-          </c:forEach>
+
+          <c:choose>
+            <c:when test="${empty orders}">
+              <p>У вас ещё нет заказов</p>
+            </c:when>
+            <c:otherwise>
+              <c:forEach var="order" items="${orders}">
+                <div class="order-card">
+                  <strong>${order.beatTitle}</strong><br>
+                  Цена: $${order.price}<br>
+                  Дата: ${order.createdAt}
+                </div>
+              </c:forEach>
+            </c:otherwise>
+          </c:choose>
+
+
+
         </div>
       </div>
     </section>

@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public User authenticate(LoginUserDto dto, HttpSession session) throws ServiceException {
     try {
-      Optional<User> userOpt = userDao.findByUsername(dto.getUsername(),0);
+      Optional<User> userOpt = userDao.findByUsername(dto.getUsername(), 0);
 
       if (userOpt.isEmpty() || !PasswordEncoder.verify(dto.getPassword(), userOpt.get().getPasswordHash())) {
         throw new ServiceException("Invalid login or password");
@@ -28,7 +28,8 @@ public class UserServiceImpl implements UserService {
       User user = userOpt.get();
       session.setAttribute("userId", user.getId());
       session.setAttribute("role", user.getRole());
-      return userOpt.get();
+
+      return user;
     } catch (DaoException e) {
       throw new ServiceException("Failed to authenticate user", e);
     }
@@ -38,18 +39,15 @@ public class UserServiceImpl implements UserService {
   public User register(RegisterUserDto dto) throws ServiceException {
     try {
       Optional<User> userByUsername = userDao.findByUsername(dto.getUsername(), 0);
-      if (userByUsername.isPresent()) {
+      if (userByUsername.isPresent())
         throw new ServiceException("Username is already taken");
-      }
 
       Optional<User> userByEmail = userDao.findByEmail(dto.getEmail(), 0);
-      if (userByEmail.isPresent()) {
+      if (userByEmail.isPresent())
         throw new ServiceException("Email is already taken");
-      }
 
-      if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+      if (!dto.getPassword().equals(dto.getConfirmPassword()))
         throw new ServiceException("Passwords do not match");
-      }
 
       var hashedPassword = PasswordEncoder.encode(dto.getPassword());
 
